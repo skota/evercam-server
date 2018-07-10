@@ -104,11 +104,11 @@ defmodule EvercamMedia.Snapshot.CamClient do
       case parse_snapshot_response(response) do
         {:ok, _} ->
           Util.broadcast_camera_response(camera_exid, timestamp, snapshot_response_time, description, "Snapshot")
-          List.insert_at(response_times, -1, %{timestamp: timestamp, res_time: snapshot_response_time, response: "Snapshot", description: description})
+          List.insert_at(response_times, -1, "#{timestamp}\t#{snapshot_response_time}\tSnapshot\t#{description}")
         {:error, error} ->
           error_reason = error |> Error.parse
           Util.broadcast_camera_response(camera_exid, timestamp, snapshot_response_time, description, error_reason)
-          List.insert_at(response_times, -1, %{timestamp: timestamp, res_time: snapshot_response_time, response: error_reason, description: description})
+          List.insert_at(response_times, -1, "#{timestamp}\t#{snapshot_response_time}\t#{error_reason}\t#{description}")
       end
     ConCache.dirty_put(:camera_response_times, camera_exid, response_times)
   end
@@ -116,13 +116,17 @@ defmodule EvercamMedia.Snapshot.CamClient do
   defp reset_response_time_list([], _curr_date_time, _camera_exid), do: []
   defp reset_response_time_list(response_times, curr_date_time, camera_exid) do
     last_date_time =
-      List.first(response_times).timestamp
+      List.first(response_times)
+      |> String.split("\t")
+      |> List.first
+      |> String.to_integer
       |> Calendar.DateTime.Parse.unix!
 
     case Calendar.DateTime.diff(curr_date_time, last_date_time) do
-      {:ok, seconds, _, :after} when seconds > 1800 ->
+      {:ok, seconds, _, :after} when seconds > 60 ->
         metadata = List.delete_at(response_times, 0)
         EvercamMedia.Snapshot.Storage.camera_response_info_save(camera_exid, curr_date_time, metadata)
+        ConCache.delete(:camera_response_times, camera_exid)
         []
       _ -> response_times
     end
