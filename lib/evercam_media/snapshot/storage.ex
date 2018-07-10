@@ -81,6 +81,56 @@ defmodule EvercamMedia.Snapshot.Storage do
     end
   end
 
+  def camera_response_info_save(camera_exid, datetime, metadata) do
+    hackney = [pool: :seaweedfs_upload_pool]
+    file_path = datetime |> Calendar.Strftime.strftime!("/#{camera_exid}/%Y_%m_%d.json")
+    url = @seaweedfs <> file_path
+
+    data =
+      case HTTPoison.get(url, [], hackney: hackney) do
+        {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+          decoded_metadata = Poison.decode!(body) ++ metadata
+          Poison.encode!(decoded_metadata)
+        {:ok, %HTTPoison.Response{status_code: 404}} ->
+          Poison.encode!(metadata)
+        error ->
+          raise "Camera response info upload at '#{file_path}' failed with: #{inspect error}"
+      end
+    case HTTPoison.post(url, {:multipart, [{file_path, data, []}]}, [], hackney: hackney) do
+      {:ok, response} -> response
+      {:error, error} -> Logger.info "[camera_response_info_save] [#{file_path}] [#{inspect error}]"
+    end
+  end
+
+  def get_camera_response_info(camera_exid, datetime) do
+    hackney = [pool: :seaweedfs_upload_pool]
+    file_path = datetime |> Calendar.Strftime.strftime!("/#{camera_exid}/%Y_%m_%d.json")
+    url = @seaweedfs <> file_path
+
+    case HTTPoison.get(url, [], hackney: hackney) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        Poison.decode!(body)
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        []
+      error ->
+        raise "Camera response info upload at '#{file_path}' failed with: #{inspect error}"
+    end
+  end
+
+  def delete_response_info(camera_exid) do
+    hackney = [pool: :seaweedfs_download_pool, recv_timeout: 30_000_000]
+    seconds_to_day_before_expiry = 7 * (24 * 60 * 60) * -1
+    day_before_expiry =
+      Calendar.DateTime.now_utc
+      |> Calendar.DateTime.advance!(seconds_to_day_before_expiry)
+      |> Calendar.DateTime.to_date
+
+    file_path = day_before_expiry |> Calendar.Strftime.strftime!("/#{camera_exid}/%Y_%m_%d.json")
+    url = @seaweedfs <> file_path
+    Logger.debug "Delete camera response time info before 7th day"
+    HTTPoison.delete!("#{url}?recursive=true", [], hackney: hackney)
+  end
+
   def seaweedfs_thumbnail_export(file_path, image) do
     path = String.replace_leading(file_path, "/storage", "")
     hackney = [pool: :seaweedfs_upload_pool]

@@ -6,7 +6,7 @@ defmodule EvercamMedia.Snapshot.Deletion do
 
   use GenStage
   require Logger
-  import EvercamMedia.Snapshot.Storage, only: [cleanup: 1]
+  alias EvercamMedia.Snapshot.Storage
 
   ################
   ## Client API ##
@@ -75,7 +75,10 @@ defmodule EvercamMedia.Snapshot.Deletion do
     Logger.debug "start deletion for camera: #{state.name}"
     state.config.camera_id
     |> CloudRecording.by_camera_id
-    |> cleanup
+    |> Storage.cleanup
+
+    state.config.camera_id
+    |> Storage.delete_response_info
 
     timer = start_timer(:delete)
     {:noreply, [], Map.put(state, :timer, timer)}

@@ -36,14 +36,15 @@ defmodule EvercamMediaWeb.LogController do
     end
   end
 
-  def response_time(conn, %{"id" => exid}) do
+  def response_time(conn, %{"id" => exid} = _params) do
     current_user = conn.assigns[:current_user]
     camera = Camera.get_full(exid)
 
     with :ok <- ensure_camera_exists(camera, exid, conn),
          :ok <- ensure_can_edit(current_user, camera, conn)
     do
-      camera_response = ConCache.get(:camera_response_times, camera.exid)
+      current_date = Calendar.DateTime.now!("UTC")
+      camera_response = EvercamMedia.Snapshot.Storage.get_camera_response_info(camera.exid, current_date)
       conn |> json(camera_response)
     end
   end

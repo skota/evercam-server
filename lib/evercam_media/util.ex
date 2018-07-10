@@ -95,7 +95,7 @@ defmodule EvercamMedia.Util do
     EvercamMediaWeb.Endpoint.broadcast(
       "livetail:#{camera_exid}",
       "camera-response",
-      %{timestamp: timestamp, response_time: response_time, response_type: response_type, description: description})
+      %{timestamp: timestamp, res_time: response_time, response: response_type, description: description})
   end
 
   def error_handler(error) do
