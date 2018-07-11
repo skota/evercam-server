@@ -123,7 +123,7 @@ defmodule EvercamMedia.Snapshot.CamClient do
       |> Calendar.DateTime.Parse.unix!
 
     case Calendar.DateTime.diff(curr_date_time, last_date_time) do
-      {:ok, seconds, _, :after} when seconds > 60 ->
+      {:ok, seconds, _, :after} when seconds > 1800 ->
         metadata = List.delete_at(response_times, 0)
         EvercamMedia.Snapshot.Storage.camera_response_info_save(camera_exid, curr_date_time, metadata)
         ConCache.delete(:camera_response_times, camera_exid)
