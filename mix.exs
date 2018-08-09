@@ -65,7 +65,8 @@ defmodule EvercamMedia.Mixfile do
     :sweet_xml,
     :phoenix_swagger,
     :ex_json_schema,
-    :nadia
+    :nadia,
+    :distillery
   ]
 
   # Specifies which paths to compile per environment
@@ -82,7 +83,7 @@ defmodule EvercamMedia.Mixfile do
       {:credo, "~> 0.8.8", only: :dev},
       {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:ecto, "~> 2.1.4"},
-      {:distillery, "~> 1.5"},
+      {:distillery, "~> 2.0.0-rc.8"},
       {:geo, "~> 1.4"},
       {:httpoison, github: "ijunaid8989/httpoison", override: true},
       {:jsx, "~> 2.8.2", override: true},

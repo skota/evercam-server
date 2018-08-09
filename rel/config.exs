@@ -2,7 +2,8 @@
 # They can then be used by adding `plugin MyPlugin` to
 # either an environment, or release definition, where
 # `MyPlugin` is the name of the plugin module.
-Path.join(["rel", "plugins", "*.exs"])
+~w(rel plugins *.exs)
+|> Path.join()
 |> Path.wildcard()
 |> Enum.map(&Code.eval_file(&1))
 
@@ -30,13 +31,13 @@ environment :dev do
   # dev mode.
   set dev_mode: true
   set include_erts: false
-  set cookie: :"g73:7;Znd@8,7R@8@~$|Z?u)h?}nUN1.4!tfVYgtsOjSrU%_ks3=Xn@V^}WU(~5g"
+  set cookie: :"Ht*Sd&uNNB]}}E;a~a/?&n~uogVhz>@|{,5`sX(>xK{A`@M,kj`0dF{s~`ry?XdJ"
 end
 
 environment :prod do
   set include_erts: true
   set include_src: false
-  set cookie: :"%jhjQX,JU$w`k05qciAjb=]KQyXzG!Vn9/(^WDSy!)P1]:Y*;F,Cf=A2B32tzgp@"
+  set cookie: :"Qf*;>$8`bG)vnRLU[AS(HLh9:]Qd:f)]%,`!Vfl^@Nek>OeeFRtl|&chJmdb{Ml("
 end
 
 # You may define one or more releases in this file.
