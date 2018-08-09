@@ -82,7 +82,7 @@ defmodule EvercamMedia.Mixfile do
       {:credo, "~> 0.8.8", only: :dev},
       {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:ecto, "~> 2.1.4"},
-      {:exrm, "~> 1.0.8"},
+      {:distillery, "~> 1.5"},
       {:geo, "~> 1.4"},
       {:httpoison, github: "ijunaid8989/httpoison", override: true},
       {:jsx, "~> 2.8.2", override: true},
