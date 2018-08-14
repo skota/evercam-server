@@ -73,23 +73,13 @@ config :evercam_media,
   seaweedfs_url: System.get_env["SEAWEEDFS_URL"],
   seaweedfs_url_1: System.get_env["SEAWEEDFS_URL_1"]
 
-config :quantum, :evercam_media,
-  cron: [
-    kill_ffmpegs: [
-      task: {"EvercamMedia.Util", "kill_all_ffmpegs"},
-      schedule: "@daily",
-      overlap: false
-    ],
-    shared_reminder: [
-      task: {"EvercamMedia.ShareRequestReminder", "check_share_requests"},
-      schedule: "@hourly",
-      overlap: false
-    ],
-    offline_reminder: [
-      task: {"EvercamMedia.OfflinePeriodicReminder", "offline_cameras_reminder"},
-      schedule: "@hourly",
-      overlap: false
-    ]
+config :evercam_media,
+  EvercamMedia.Scheduler,
+  overlap: false,
+  jobs: [
+    {"@daily", {EvercamMedia.Util, :kill_all_ffmpegs, []}},
+    {"@hourly", {EvercamMedia.ShareRequestReminder, :check_share_requests, []}},
+    {"@hourly", {EvercamMedia.OfflinePeriodicReminder, :offline_cameras_reminder, []}}
   ]
 
 config :evercam_media, :mailgun,
@@ -117,3 +107,6 @@ config :evercam_media, EvercamMedia.SnapshotRepo,
   pool_size: 100,
   lazy: false,
   ssl: true
+
+config :evercam_media, EvercamMedia.Scheduler,
+  debug_logging: false

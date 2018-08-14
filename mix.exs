@@ -93,7 +93,7 @@ defmodule EvercamMedia.Mixfile do
       {:phoenix_html, "~> 2.9.3"},
       {:porcelain, "~> 2.0.3"},
       {:postgrex, "~> 0.13.5"},
-      {:quantum, "~> 1.9.2"},
+      {:quantum, "~> 2.3"},
       {:uuid, "~> 1.1.7"},
       {:relx, "~> 3.26.0"},
       {:erlware_commons, "~> 1.2.0"},
