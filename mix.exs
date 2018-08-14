@@ -94,6 +94,7 @@ defmodule EvercamMedia.Mixfile do
       {:porcelain, "~> 2.0.3"},
       {:postgrex, "~> 0.13.5"},
       {:quantum, "~> 2.3"},
+      {:timex, "~> 3.3"},
       {:uuid, "~> 1.1.7"},
       {:relx, "~> 3.26.0"},
       {:erlware_commons, "~> 1.2.0"},
