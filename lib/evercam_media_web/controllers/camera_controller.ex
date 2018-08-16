@@ -300,6 +300,7 @@ defmodule EvercamMediaWeb.CameraController do
       |> Camera.delete_changeset(camera_params)
       |> Repo.update!
 
+      spawn(fn -> insert_activity(caller, %{ id: 0, exid: camera.exid }, user_request_ip(conn), get_user_agent(conn)) end)
       spawn(fn -> delete_snapshot_worker(camera) end)
       spawn(fn -> delete_camera_worker(camera) end)
       json(conn, %{})
@@ -613,6 +614,17 @@ defmodule EvercamMediaWeb.CameraController do
     Archive.delete_by_camera(camera.id)
     Compare.delete_by_camera(camera.id)
     Camera.delete_by_id(camera.id)
+  end
+
+  defp insert_activity(caller, camera, ip, agent) do
+    spawn(fn ->
+      CameraActivity.log_activity(caller, camera, "camera deleted",
+        %{
+          ip: ip,
+          agent: agent
+        }
+      )
+    end)
   end
 
   defp delete_snapshot_worker(camera) do

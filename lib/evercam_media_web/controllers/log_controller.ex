@@ -36,6 +36,16 @@ defmodule EvercamMediaWeb.LogController do
     end
   end
 
+  def create(conn,  params) do
+    current_user = conn.assigns[:current_user]
+
+    with :ok <- authorized(conn, current_user),
+         {:ok, camera} <- camera_exists(params["camera_exid"])
+    do
+      CameraActivity.log_activity(current_user, camera, "created", %{ip: user_request_ip(conn), agent: get_user_agent(conn)})
+    end
+  end
+
   def response_time(conn, %{"id" => exid}) do
     current_user = conn.assigns[:current_user]
     camera = Camera.get_full(exid)
@@ -85,6 +95,16 @@ defmodule EvercamMediaWeb.LogController do
     |> render(LogView, "show.json", %{total_pages: total_pages, camera_exid: camera.exid, camera_name: camera.name, logs: logs})
   end
 
+  defp camera_exists(camera_exid) when camera_exid in [nil, ""] do
+    {:ok, %{ id: 0, exid: "" }}
+  end
+  defp camera_exists(camera_exid) do
+    case Camera.by_exid_with_associations(camera_exid) do
+      nil -> {:ok, %{ id: 0, exid: "" }}
+      %Camera{} = camera -> {:ok, camera}
+    end
+  end
+
   defp parse_to(to) when to in [nil, ""], do: Calendar.DateTime.now_utc |> Calendar.DateTime.to_erl
   defp parse_to(to), do: to |> Calendar.DateTime.Parse.unix! |> Calendar.DateTime.to_erl
 
@@ -102,4 +122,7 @@ defmodule EvercamMediaWeb.LogController do
 
   defp ensure_params(:ok, _conn), do: :ok
   defp ensure_params({:invalid, message}, conn), do: render_error(conn, 400, message)
+
+  defp authorized(conn, nil), do: render_error(conn, 401, "Unauthorized.")
+  defp authorized(_conn, _current_user), do: :ok
 end
