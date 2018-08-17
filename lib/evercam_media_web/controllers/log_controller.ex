@@ -42,7 +42,15 @@ defmodule EvercamMediaWeb.LogController do
     with :ok <- authorized(conn, current_user),
          {:ok, camera} <- camera_exists(params["camera_exid"])
     do
-      CameraActivity.log_activity(current_user, camera, "created", %{ip: user_request_ip(conn), agent: get_user_agent(conn)})
+      extra = %{
+        browser: params["browser"],
+        ip: user_request_ip(conn),
+        version: params["version"],
+        country: params["country"],
+        country_code: params["country_code"]
+      }
+      CameraActivity.log_activity(current_user, camera, params["action"], extra)
+      conn |> json(%{})
     end
   end
 

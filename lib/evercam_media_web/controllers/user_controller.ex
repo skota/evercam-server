@@ -159,7 +159,7 @@ defmodule EvercamMediaWeb.UserController do
 
   def create(conn, params) do
     with :ok <- ensure_application(conn, params["token"]),
-         :ok <- ensure_country(params["country"], conn)
+         {:ok, country_id} <- ensure_country(params["country"], conn)
     do
       requester_ip = user_request_ip(conn)
       user_agent = get_user_agent(conn)
@@ -168,12 +168,12 @@ defmodule EvercamMediaWeb.UserController do
       api_key = UUID.uuid4(:hex)
 
       params =
-        case Country.get_by_code(params["country"]) do
-          {:ok, country} -> Map.merge(params, %{"country_id" => country.id}) |> Map.delete("country")
-          {:error, nil} -> Map.delete(params, "country")
-        end
-
-      params = Map.merge(params, %{"api_id" => api_id, "api_key" => api_key})
+        params
+        |> add_parameter("country_id", country_id)
+        |> add_parameter("api_id", api_id)
+        |> add_parameter("api_key", api_key)
+        |> add_parameter("telegram_username", params["telegram_username"])
+        |> Map.delete("country")
 
       params =
         case has_share_request_key?(share_request_key) do
@@ -183,8 +183,6 @@ defmodule EvercamMediaWeb.UserController do
           false ->
             Map.delete(params, "share_request_key")
         end
-
-      params = add_parameter(params, :telegram_username, params["telegram_username"])
 
       changeset = User.changeset(%User{}, params)
       case Repo.insert(changeset) do

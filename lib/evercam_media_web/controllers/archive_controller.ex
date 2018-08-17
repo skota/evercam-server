@@ -271,7 +271,7 @@ defmodule EvercamMediaWeb.ArchiveController do
     do
       Archive.delete_by_exid(archive_id)
       spawn(fn -> Storage.delete_archive(camera.exid, archive_id) end)
-      CameraActivity.log_activity(current_user, camera, "archive deleted", %{ip: user_request_ip(conn)})
+      CameraActivity.log_activity(current_user, camera, "archive deleted", %{name: archive.title, ip: user_request_ip(conn)})
       json(conn, %{})
     end
   end

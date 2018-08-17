@@ -32,11 +32,6 @@ config :evercam_media, :run_spawn, true
 # and calculating stacktraces is usually expensive.
 config :phoenix, :stacktrace_depth, 20
 
-config :evercam_media, :mailgun,
-  domain: "",
-  key: "",
-  mode: :dev
-
 # Configure your database
 config :evercam_media, EvercamMedia.Repo,
   adapter: Ecto.Adapters.Postgres,
