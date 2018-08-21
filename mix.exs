@@ -6,7 +6,7 @@ defmodule EvercamMedia.Mixfile do
     git_sha = String.slice(result, 0, 7)
 
     [app: :evercam_media,
-     version: "1.0.1-#{git_sha}",
+     version: "1.0.3-#{git_sha}",
      elixir: "~> 1.7",
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,

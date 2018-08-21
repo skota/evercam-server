@@ -10,6 +10,7 @@ defmodule EvercamMediaWeb.UserView do
           firstname: user.firstname,
           lastname: user.lastname,
           username: user.username,
+          firstname: user.firstname,
           telegram_username: user.telegram_username,
           email: user.email,
           country: User.get_country_attr(user, :iso3166_a2),
