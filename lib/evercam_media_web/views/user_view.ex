@@ -7,6 +7,7 @@ defmodule EvercamMediaWeb.UserView do
       users: [
         %{
           id: user.username,
+          firstname: user.firstname,
           lastname: user.lastname,
           username: user.username,
           telegram_username: user.telegram_username,
